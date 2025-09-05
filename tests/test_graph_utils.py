@@ -17,7 +17,7 @@ def test_get_graph_info():
 
 
 def test_save_labeled_two_cycles_graph(tmp_path):
-    graph_path = temp_file = tmp_path / "two_cycles.dot"
+    graph_path = tmp_path / "two_cycles.dot"
     save_labeled_two_cycles_graph(3, 4, ("a", "b"), graph_path)
 
     actual = nx.nx_pydot.read_dot(graph_path)
