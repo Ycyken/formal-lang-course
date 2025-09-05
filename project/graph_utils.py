@@ -18,11 +18,13 @@ def get_graph_info(name: str) -> GraphInfo:
 
     edg_number = graph.number_of_edges()
     vert_number = graph.number_of_nodes()
-    labels = {data['label'] for _, _, data in graph.edges.data()}
+    labels = {data["label"] for _, _, data in graph.edges.data()}
 
     return GraphInfo(vert_number, edg_number, labels)
 
 
-def save_labeled_two_cycles_graph(n: int, m: int, labels: Tuple[str, str], file_path: str) -> None:
+def save_labeled_two_cycles_graph(
+    n: int, m: int, labels: Tuple[str, str], file_path: str
+) -> None:
     graph = cfpq_data.labeled_two_cycles_graph(n, m, labels=labels)
     write_dot(graph, file_path)

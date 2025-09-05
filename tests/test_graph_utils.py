@@ -11,7 +11,7 @@ def test_get_graph_info():
     bzip_path = cfpq_data.download("bzip")
     bzip = cfpq_data.graph_from_csv(bzip_path)
 
-    labels = {data['label'] for _, _, data in bzip.edges.data()}
+    labels = {data["label"] for _, _, data in bzip.edges.data()}
     expected = GraphInfo(len(bzip.nodes), len(bzip.edges), labels)
     assert actual == expected
 
@@ -27,6 +27,6 @@ def test_save_labeled_two_cycles_graph(tmp_path):
         expected,
         actual,
         node_match=lambda n1, n2: True,
-        edge_match=lambda e1, e2: e1.get("label") == e2.get("label")
+        edge_match=lambda e1, e2: e1.get("label") == e2.get("label"),
     )
     assert matcher.is_isomorphic()
