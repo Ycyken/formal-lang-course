@@ -16,15 +16,18 @@ def create_front(adj1: AdjacencyMatrixFA, adj2: AdjacencyMatrixFA) -> csr_matrix
     return vstack(blocks, format="csr", dtype=bool)
 
 
-def ms_bfs_based_rpq(regex: str, graph: MultiDiGraph, start_nodes: set[int],
-                     final_nodes: set[int]) -> set[tuple[int, int]]:
+def ms_bfs_based_rpq(
+    regex: str, graph: MultiDiGraph, start_nodes: set[int], final_nodes: set[int]
+) -> set[tuple[int, int]]:
     graph_nfa = graph_to_nfa(graph, start_nodes, final_nodes)
     regex_dfa = regex_to_dfa(regex)
 
     graph_adj = AdjacencyMatrixFA(graph_nfa)
     regex_adj = AdjacencyMatrixFA(regex_dfa)
 
-    transposed_graph_decomp = {label: m.transpose() for label, m in graph_adj.matrices.items()}
+    transposed_graph_decomp = {
+        label: m.transpose() for label, m in graph_adj.matrices.items()
+    }
     intersected_alphabet = graph_adj.alphabet & regex_adj.alphabet
 
     front = create_front(graph_adj, regex_adj)
@@ -35,7 +38,11 @@ def ms_bfs_based_rpq(regex: str, graph: MultiDiGraph, start_nodes: set[int],
         for symbol in intersected_alphabet:
             blocks = []
             for block_number in range(len(graph_adj.start_idx)):
-                block = front[block_number * graph_adj.states_count: (block_number + 1) * graph_adj.states_count, :]
+                block = front[
+                    block_number * graph_adj.states_count : (block_number + 1)
+                    * graph_adj.states_count,
+                    :,
+                ]
                 block = transposed_graph_decomp[symbol] @ block
                 blocks.append(block)
             joint_blocks = vstack(blocks, format="csr", dtype=bool)
@@ -49,7 +56,11 @@ def ms_bfs_based_rpq(regex: str, graph: MultiDiGraph, start_nodes: set[int],
     result = set()
     start_nodes = sorted(list(start_nodes))
     for block_number, graph_start_node in enumerate(start_nodes):
-        block = visited[block_number * graph_adj.states_count: (block_number + 1) * graph_adj.states_count, :]
+        block = visited[
+            block_number * graph_adj.states_count : (block_number + 1)
+            * graph_adj.states_count,
+            :,
+        ]
         for graph_final_node in final_nodes:
             graph_final_idx = graph_adj.states_to_idxs[graph_final_node]
             for regex_final_idx in regex_adj.final_idxs:
