@@ -20,10 +20,10 @@ class AdjacencyMatrixFA:
         self.states_count: int = len(automaton.states)
         self.matrices: dict[Any, csr_matrix] = {}
         self.alphabet: set[Any] = automaton.symbols
-        self.start_states: set[int] = {
+        self.start_idx: set[int] = {
             self.states_to_idxs[s] for s in automaton.start_states
         }
-        self.final_states: set[int] = {
+        self.final_idxs: set[int] = {
             self.states_to_idxs[s] for s in automaton.final_states
         }
 
@@ -43,7 +43,7 @@ class AdjacencyMatrixFA:
     def accepts(self, word: Iterable[Symbol]) -> bool:
         front = csr_matrix((1, self.states_count), dtype=bool)
 
-        for s in self.start_states:
+        for s in self.start_idx:
             front[0, s] = True
 
         for symbol in word:
@@ -53,7 +53,7 @@ class AdjacencyMatrixFA:
             if front.nnz == 0:
                 return False
 
-        if set(front.nonzero()[1]) & self.final_states:
+        if set(front.nonzero()[1]) & self.final_idxs:
             return True
         return False
 
@@ -75,8 +75,8 @@ class AdjacencyMatrixFA:
     def is_empty(self) -> bool:
         tc = self.transitive_closure()
 
-        for s in self.start_states:
-            for f in self.final_states:
+        for s in self.start_idx:
+            for f in self.final_idxs:
                 if tc[s, f]:
                     return False
 
@@ -84,7 +84,7 @@ class AdjacencyMatrixFA:
 
 
 def intersect_automata(
-    automaton1: AdjacencyMatrixFA, automaton2: AdjacencyMatrixFA
+        automaton1: AdjacencyMatrixFA, automaton2: AdjacencyMatrixFA
 ) -> AdjacencyMatrixFA:
     intersected = AdjacencyMatrixFA(NondeterministicFiniteAutomaton())
     intersected.alphabet = automaton1.alphabet & automaton2.alphabet
@@ -92,15 +92,15 @@ def intersect_automata(
     intersected.states_to_idxs = {}
 
     for (s1, idx1), (s2, idx2) in product(
-        automaton1.states_to_idxs.items(), automaton2.states_to_idxs.items()
+            automaton1.states_to_idxs.items(), automaton2.states_to_idxs.items()
     ):
         new_idx = idx1 * automaton2.states_count + idx2
         intersected.states_to_idxs[(s1, s2)] = new_idx
 
-        if (idx1 in automaton1.start_states) and (idx2 in automaton2.start_states):
-            intersected.start_states.add(new_idx)
-        if (idx1 in automaton1.final_states) and (idx2 in automaton2.final_states):
-            intersected.final_states.add(new_idx)
+        if (idx1 in automaton1.start_idx) and (idx2 in automaton2.start_idx):
+            intersected.start_idx.add(new_idx)
+        if (idx1 in automaton1.final_idxs) and (idx2 in automaton2.final_idxs):
+            intersected.final_idxs.add(new_idx)
 
     for symbol in intersected.alphabet:
         m1 = automaton1.matrices[symbol]
@@ -111,7 +111,7 @@ def intersect_automata(
 
 
 def tensor_based_rpq(
-    regex: str, graph: MultiDiGraph, start_nodes: set[int], final_nodes: set[int]
+        regex: str, graph: MultiDiGraph, start_nodes: set[int], final_nodes: set[int]
 ) -> set[tuple[int, int]]:
     automaton_regex = regex_to_dfa(regex)
     automaton_graph = graph_to_nfa(graph, start_nodes, final_nodes)
@@ -124,10 +124,10 @@ def tensor_based_rpq(
 
     result = set()
     for start_regex, final_regex, start_graph, final_graph in product(
-        automaton_regex.start_states,
-        automaton_regex.final_states,
-        automaton_graph.start_states,
-        automaton_graph.final_states,
+            automaton_regex.start_states,
+            automaton_regex.final_states,
+            automaton_graph.start_states,
+            automaton_graph.final_states,
     ):
         start_idx = intersected.states_to_idxs[(start_regex, start_graph)]
         final_idx = intersected.states_to_idxs[(final_regex, final_graph)]
