@@ -69,8 +69,8 @@ def hellings_based_cfpq(
                     edges_to_add.add((n_k, v, d))
         r.update(edges_to_add)
 
-    answer = set()
-    for nt, v1, v2 in r:
-        if nt == cfg.start_symbol and v1 in start_nodes and v2 in final_nodes:
-            answer.add((v1, v2))
-    return answer
+    return {
+        (v1, v2)
+        for (nt, v1, v2) in r
+        if nt == cfg.start_symbol and v1 in start_nodes and v2 in final_nodes
+    }
