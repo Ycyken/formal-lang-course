@@ -24,9 +24,9 @@ def rsm_to_nfa(rsm: RecursiveAutomaton) -> NondeterministicFiniteAutomaton:
 
 
 def msbfs(
-        intersect_adj: AdjacencyMatrixFA,
-        graph_adj: AdjacencyMatrixFA,
-        rsm_adj: AdjacencyMatrixFA,
+    intersect_adj: AdjacencyMatrixFA,
+    graph_adj: AdjacencyMatrixFA,
+    rsm_adj: AdjacencyMatrixFA,
 ) -> set[tuple[str, int, int]]:
     n = intersect_adj.states_count
 
@@ -43,7 +43,7 @@ def msbfs(
         nt, _ = r_st.value
         r_idx = rsm_adj.states_to_idxs[r_st]
         g_idx = graph_adj.states_to_idxs[g_st]
-        if r_idx in rsm_adj.start_idx:
+        if r_idx in rsm_adj.start_idxs:
             starts[nt].append((idx, g_idx))
         if r_idx in rsm_adj.final_idxs:
             finals[nt].append((idx, g_idx))
@@ -85,10 +85,10 @@ def msbfs(
 
 
 def tensor_based_cfpq(
-        rsm: pyformlang.rsa.RecursiveAutomaton,
-        graph: nx.DiGraph,
-        start_nodes: set[int] = None,
-        final_nodes: set[int] = None,
+    rsm: pyformlang.rsa.RecursiveAutomaton,
+    graph: nx.DiGraph,
+    start_nodes: set[int] = None,
+    final_nodes: set[int] = None,
 ) -> set[tuple[int, int]]:
     rsm_adj = AdjacencyMatrixFA(rsm_to_nfa(rsm))
     graph_nfa = graph_to_nfa(nx.MultiDiGraph(graph), start_nodes, final_nodes)
@@ -113,7 +113,7 @@ def tensor_based_cfpq(
     res = set()
     idx_to_state = {i: s for s, i in graph_adj.states_to_idxs.items()}
     for u, v in zip(*graph_adj.matrices[rsm.initial_label].nonzero()):
-        if u in graph_adj.start_idx and v in graph_adj.final_idxs:
+        if u in graph_adj.start_idxs and v in graph_adj.final_idxs:
             res.add((idx_to_state[u].value, idx_to_state[v].value))
     return res
 

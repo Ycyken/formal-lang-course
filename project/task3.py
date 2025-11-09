@@ -20,7 +20,7 @@ class AdjacencyMatrixFA:
         self.states_count: int = len(automaton.states)
         self.matrices: dict[Any, csr_matrix] = {}
         self.alphabet: set[Any] = automaton.symbols
-        self.start_idx: set[int] = {
+        self.start_idxs: set[int] = {
             self.states_to_idxs[s] for s in automaton.start_states
         }
         self.final_idxs: set[int] = {
@@ -43,7 +43,7 @@ class AdjacencyMatrixFA:
     def accepts(self, word: Iterable[Symbol]) -> bool:
         front = csr_matrix((1, self.states_count), dtype=bool)
 
-        for s in self.start_idx:
+        for s in self.start_idxs:
             front[0, s] = True
 
         for symbol in word:
@@ -75,7 +75,7 @@ class AdjacencyMatrixFA:
     def is_empty(self) -> bool:
         tc = self.transitive_closure()
 
-        for s in self.start_idx:
+        for s in self.start_idxs:
             for f in self.final_idxs:
                 if tc[s, f]:
                     return False
@@ -97,8 +97,8 @@ def intersect_automata(
         new_idx = idx1 * automaton2.states_count + idx2
         intersected.states_to_idxs[(s1, s2)] = new_idx
 
-        if (idx1 in automaton1.start_idx) and (idx2 in automaton2.start_idx):
-            intersected.start_idx.add(new_idx)
+        if (idx1 in automaton1.start_idxs) and (idx2 in automaton2.start_idxs):
+            intersected.start_idxs.add(new_idx)
         if (idx1 in automaton1.final_idxs) and (idx2 in automaton2.final_idxs):
             intersected.final_idxs.add(new_idx)
 
