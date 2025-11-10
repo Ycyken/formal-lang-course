@@ -114,7 +114,7 @@ def tensor_based_cfpq(
     idx_to_state = {i: s for s, i in graph_adj.states_to_idxs.items()}
     m0 = graph_adj.matrices[init_nt]
     for src, dst in zip(*m0.nonzero()):
-        if src in graph_adj.start_idx and dst in graph_adj.final_idxs:
+        if src in graph_adj.start_idxs and dst in graph_adj.final_idxs:
             res.add((idx_to_state[src].value, idx_to_state[dst].value))
     return res
 

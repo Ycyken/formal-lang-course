@@ -6,11 +6,11 @@ from project.task3 import AdjacencyMatrixFA
 
 
 def create_front(adj1: AdjacencyMatrixFA, adj2: AdjacencyMatrixFA) -> csr_matrix:
-    start_states1 = sorted(list(adj1.start_idx))
+    start_states1 = sorted(list(adj1.start_idxs))
     blocks = []
     for s1 in start_states1:
         block = csr_matrix((adj1.states_count, adj2.states_count), dtype=bool)
-        for s2 in adj2.start_idx:
+        for s2 in adj2.start_idxs:
             block[s1, s2] = True
         blocks.append(block)
     return vstack(blocks, format="csr", dtype=bool)
@@ -37,7 +37,7 @@ def ms_bfs_based_rpq(
         new_front = csr_matrix(front.shape, dtype=bool)
         for symbol in intersected_alphabet:
             blocks = []
-            for block_number in range(len(graph_adj.start_idx)):
+            for block_number in range(len(graph_adj.start_idxs)):
                 block = front[
                     block_number * graph_adj.states_count : (block_number + 1)
                     * graph_adj.states_count,
